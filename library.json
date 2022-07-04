@@ -1,0 +1,18 @@
+{
+    "name": "LIGHT-TPL",
+    "version": "0.0.1",
+    "keywords": "template rendering",
+    "description": "Simple template rendering engine",
+    "homepage": "https://github.com/Alexander89/light-tpl-embedded",
+    "license": "MIT",
+    "repository": {
+      "type": "git",
+      "url": "git@github.com:Alexander89/light-tpl-embedded.git"
+    },
+    "frameworks": "*",
+    "platforms": "*",
+    "headers": [
+      "lightTPL.h",
+      "lightTPL-result.h"
+    ]
+  }
