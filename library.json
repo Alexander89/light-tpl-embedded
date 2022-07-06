@@ -1,5 +1,5 @@
 {
-    "name": "LIGHT-TPL",
+    "name": "LIGHT_TPL",
     "version": "0.0.1",
     "keywords": "template rendering",
     "description": "Simple template rendering engine",
@@ -9,10 +9,14 @@
       "type": "git",
       "url": "git@github.com:Alexander89/light-tpl-embedded.git"
     },
+    "authors": [
+      {
+        "name":  "Alex Halemba",
+        "url":   "https://github.com/alexander89",
+        "maintainer": true
+      }  
+    ],
     "frameworks": "*",
     "platforms": "*",
-    "headers": [
-      "lightTPL.h",
-      "lightTPL-result.h"
-    ]
+    "headers": ["lightTPL.h", "lightTPL-result.h"]
   }
