@@ -15,7 +15,9 @@ struct Result
   inline bool isErr() { return !ok; }
 };
 
+// Maybe not supported by your compiler.
 #define ok(T, value) Result<T>{.ok = true, .result = value};
+// Maybe not supported by your compiler.
 #define err(T, err) Result<T>{.ok = false, .error = err};
 
 #endif

@@ -13,92 +13,74 @@ LightTpl::LightTpl(const char *tpl)
   this->tpl = tpl;
   counter = 0;
   memset(keys, 0, sizeof(keys));
-  memset(owns, false, sizeof(owns));
   memset(values, 0, sizeof(values));
+  memset(externValue, 0, sizeof(externValue));
 }
 LightTpl::~LightTpl()
 {
-  for (int_fast16_t i = 0; i < counter; i++)
-    if (owns[i] == true)
-      free((void *)values[i]);
-
   memset(keys, 0, sizeof(keys));
-  memset(owns, false, sizeof(owns));
   memset(values, 0, sizeof(values));
+  memset(externValue, 0, sizeof(externValue));
 
   counter = 0;
 }
 
 void LightTpl::setValue(const char *key, const char *value)
 {
-  owns[counter] = false;
-  keys[counter] = key;
-  values[counter] = value;
+  strncpy(keys[counter], key, LTPL_MAX_KEY_LNG);
+  externValue[counter] = value;
   counter++;
 }
 
 void LightTpl::setValue(const char *key, int value)
 {
-  auto ownValue = (char *)malloc(sizeof(char) * 12);
-
 #if ARDUINO
-  itoa(value, ownValue, 10);
+  itoa(value, values[counter], 10);
 #else
-  sprintf(ownValue, "%d", value);
+  sprintf(values[counter], "%d", value);
 #endif
 
-  owns[counter] = true;
-  keys[counter] = key;
-  values[counter] = ownValue;
+  strncpy(keys[counter], key, LTPL_MAX_KEY_LNG);
 
   counter++;
 }
 
 void LightTpl::setValue(const char *key, unsigned int value)
 {
-  auto ownValue = (char *)malloc(sizeof(char) * 12);
 
 #if ARDUINO
-  utoa(value, ownValue, 10);
+  utoa(value, values[counter], 10);
 #else
-  sprintf(ownValue, "%u", value);
+  sprintf(values[counter], "%u", value);
 #endif
 
-  owns[counter] = true;
-  keys[counter] = key;
-  values[counter] = ownValue;
+  strncpy(keys[counter], key, LTPL_MAX_KEY_LNG);
 
   counter++;
 }
 
 void LightTpl::setValue(const char *key, short value)
 {
-  auto ownValue = (char *)malloc(sizeof(char) * 6);
 #if ARDUINO
-  itoa(value, ownValue, 10);
+  itoa(value, values[counter], 10);
 #else
-  sprintf(ownValue, "%d", value);
+  sprintf(values[counter], "%d", value);
 #endif
 
-  owns[counter] = true;
-  keys[counter] = key;
-  values[counter] = ownValue;
+  strncpy(keys[counter], key, LTPL_MAX_KEY_LNG);
 
   counter++;
 }
 
 void LightTpl::setValue(const char *key, unsigned short value)
 {
-  auto ownValue = (char *)malloc(sizeof(char) * 6);
 #if ARDUINO
-  utoa(value, ownValue, 10);
+  utoa(value, values[counter], 10);
 #else
-  sprintf(ownValue, "%u", value);
+  sprintf(values[counter], "%u", value);
 #endif
 
-  owns[counter] = true;
-  keys[counter] = key;
-  values[counter] = ownValue;
+  strncpy(keys[counter], key, LTPL_MAX_KEY_LNG);
 
   counter++;
 }
@@ -111,16 +93,13 @@ void LightTpl::setValue(const char *key, float value, char dec)
 
 void LightTpl::setValue(const char *key, double value, char dec)
 {
-  auto ownValue = (char *)malloc(sizeof(char) * 12);
 #if ARDUINO
-  dtostrf(value, 12, dec, ownValue);
+  dtostrf(value, 12, dec, values[counter]);
 #else
-  sprintf(ownValue, "%f", value);
+  sprintf(values[counter], "%f", value);
 #endif
 
-  owns[counter] = true;
-  keys[counter] = key;
-  values[counter] = ownValue;
+  strncpy(keys[counter], key, LTPL_MAX_KEY_LNG);
 
   counter++;
 }
@@ -147,12 +126,17 @@ void LightTpl::render(std::function<void(const char)> write)
 
       const char *value;
       if (idx.isOk())
-        value = values[idx.result];
+      {
+        if (externValue[idx.result])
+          value = externValue[idx.result];
+        else
+          value = values[idx.result];
+      }
       else
         value = "\'ERROR: Not Found\'";
 
-      for (size_t i = 0; value[i] != 0; i++)
-        write(value[i]);
+      for (size_t j = 0; value[j] != 0; j++)
+        write(value[j]);
 
       replaceMode = false;
       i++;
@@ -199,7 +183,16 @@ Result<int_fast16_t> LightTpl::findKeys(const char *key, size_t lng)
   for (int_fast16_t i = 0; i < counter; i++)
   {
     if (compKey(key, lng, keys[i]) == 0)
-      return ok(int_fast16_t, i);
+    {
+      Result<int_fast16_t> res{};
+      res.ok = true;
+      res.result = i;
+      return res;
+    }
   }
-  return err(int_fast16_t, "not found");
+
+  Result<int_fast16_t> res{};
+  res.ok = false;
+  res.error = "not found";
+  return res;
 }

@@ -15,9 +15,9 @@
 class LightTpl
 {
 private:
-  const char *keys[LTPL_MAX_VALUES];
-  bool owns[LTPL_MAX_VALUES];
-  const char *values[LTPL_MAX_VALUES];
+  char keys[LTPL_MAX_VALUES][LTPL_MAX_KEY_LNG];
+  char values[LTPL_MAX_VALUES][16];
+  const char *externValue[LTPL_MAX_VALUES];
   int_fast16_t counter;
   const char *tpl;
 
