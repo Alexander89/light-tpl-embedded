@@ -20,9 +20,14 @@ private:
   const char *externValue[LTPL_MAX_VALUES];
   int_fast16_t counter;
   const char *tpl;
+  size_t maxLng{SIZE_MAX};
 
 public:
+  // Null terminated template
   LightTpl(const char *tpl);
+  // Template with known length
+  LightTpl(const char *tpl, size_t lng);
+
   ~LightTpl();
 
   void setValue(const char *key, const char *value);

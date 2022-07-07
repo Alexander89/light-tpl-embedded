@@ -16,6 +16,16 @@ LightTpl::LightTpl(const char *tpl)
   memset(values, 0, sizeof(values));
   memset(externValue, 0, sizeof(externValue));
 }
+LightTpl::LightTpl(const char *tpl, size_t lng)
+{
+  this->tpl = tpl;
+  maxLng = lng;
+  counter = 0;
+  memset(keys, 0, sizeof(keys));
+  memset(values, 0, sizeof(values));
+  memset(externValue, 0, sizeof(externValue));
+}
+
 LightTpl::~LightTpl()
 {
   memset(keys, 0, sizeof(keys));
@@ -109,8 +119,8 @@ void LightTpl::render(std::function<void(const char)> write)
   bool replaceMode{false};
   int_fast16_t keyLng;
 
-  // run for NTS (null terminated string)
-  for (size_t i = 0; tpl[i] != 0; i++)
+  // run for NTS (null terminated string) or until maxLng
+  for (size_t i = 0; tpl[i] != 0 && i < maxLng; i++)
   {
     // +1 is ok, because of the 0 terminated string. It could be 0 on the end
     if (tpl[i] == '{' && tpl[i + 1] == '{')
